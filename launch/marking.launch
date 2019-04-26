@@ -1,0 +1,13 @@
+<launch>
+	<arg name="group"/>
+	<include file="$(find turtlebot_explorer)/launch/turtlebot_explorer_sim.launch"/>
+	<node pkg="map_server" type="map_server" name="map_server_gt" args="$(find turtlebot_explorer)/maps/explore_map.yaml">
+		<remap from="map" to="map_gt"/>
+	</node>
+	<node pkg="turtlebot_explorer" type="marking_script.py" name="marking_script" output="screen" >
+		<param name="pid_path" value="/tmp/roslaunch.pid" />
+		<param name="group_name" value="$(arg group)" />
+		<param name="timeout" value="10" />
+	</node>
+
+</launch>
