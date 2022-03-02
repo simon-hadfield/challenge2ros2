@@ -19,8 +19,6 @@
 	</node>
 
 	<!-- Explorer -->
-	<include file="$(find turtlebot_explorer)/launch/turtlebot_explorer_sim.launch">
-		<arg name="world_file" value="$(find turtlebot_explorer_marker)/worlds/$(arg world).world"/>
-	</include>
+	<include file="$(find turtlebot_explorer)/launch/turtlebot_explorer.launch"/>
 
 </launch>

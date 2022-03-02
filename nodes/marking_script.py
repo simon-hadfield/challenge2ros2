@@ -35,7 +35,7 @@ class Marker:
 
         self.group = get_param('~group', "You haven't set the group!")
         self.world = get_param('~world', "You haven't set the world!")
-        self.save_path = rospy.get_param('~savepath', "/vol/vssp/signsrc/turtlebot3_ws/challenge2_results")
+        self.save_path = rospy.get_param('~savepath', "/vol/vssp/signsrc/turtlebot3_ws/2022/challenge2_results")
         self.duration = rospy.get_param('~duration', 0)
         self.save_file = "{}/{}_{}_log.txt".format(self.save_path, self.group, self.world)
         self.save_plot = "{}/{}_{}_plot.png".format(self.save_path, self.group, self.world)
