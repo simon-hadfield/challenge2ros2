@@ -6,7 +6,8 @@ import numpy as np
 from nav_msgs.msg import OccupancyGrid
 from geometry_msgs.msg import PoseStamped
 from nav_msgs.srv import GetMap, GetMapResponse
-import scipy.misc
+#import scipy.misc
+from PIL import Image
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -35,7 +36,7 @@ class Marker:
 
         self.group = get_param('~group', "You haven't set the group!")
         self.world = get_param('~world', "You haven't set the world!")
-        self.save_path = rospy.get_param('~savepath', "/vol/vssp/signsrc/turtlebot3_ws/2022/challenge2_results")
+        self.save_path = rospy.get_param('~savepath', "/mnt/challenge2")
         self.duration = rospy.get_param('~duration', 0)
         self.save_file = "{}/{}_{}_log.txt".format(self.save_path, self.group, self.world)
         self.save_plot = "{}/{}_{}_plot.png".format(self.save_path, self.group, self.world)
@@ -156,8 +157,10 @@ class Marker:
             time_elapsed = self.current_time - self.start_time
         rospy.logwarn("Terminating after %f seconds with a score of: %0.2f%%", time_elapsed.to_sec(), self.score[-1])
 
-        scipy.misc.imsave(self.save_map, self.curr_map)
-        scipy.misc.imsave(self.save_map_gt, self.gt_map)
+        #scipy.misc.imsave(self.save_map, self.curr_map)
+        #scipy.misc.imsave(self.save_map_gt, self.gt_map)
+        Image.fromarray(np.uint8(self.curr_map*255)).save(self.save_map)
+        Image.fromarray(np.uint8(self.gt_map*255)).save(self.save_map_gt)
 
         f = open(self.save_file, "w")
         f.write("{:0.3f}".format(self.score[-1]))
