@@ -36,12 +36,11 @@ class Marker:
 
         self.group = get_param('~group', "You haven't set the group!")
         self.world = get_param('~world', "You haven't set the world!")
-        self.save_path = rospy.get_param('~savepath', "/mnt/challenge2")
+        self.save_path = rospy.get_param('~savepath', "/vol/vssp/signsrc/challenge2")
         self.duration = rospy.get_param('~duration', 0)
         self.save_file = "{}/{}_{}_log.txt".format(self.save_path, self.group, self.world)
         self.save_plot = "{}/{}_{}_plot.png".format(self.save_path, self.group, self.world)
         self.save_map = "{}/{}_{}_est.jpg".format(self.save_path, self.group, self.world)
-        self.save_map_gt = "{}/{}_{}_gt.jpg".format(self.save_path, self.group, self.world)
         rospy.loginfo("Saving to {}".format(self.save_file))
 
         # Define a Service for Map
@@ -56,10 +55,6 @@ class Marker:
 
         self.latest_map_msg = None
 
-        self.gt_map = None
-        self.total_cells = self.get_gt_map()
-        rospy.loginfo("Total Cells %i", self.total_cells)
-
         self.start_time = rospy.Time.now()
         self.current_time = rospy.Time.now()
         self.max_duration = rospy.Duration(self.duration)
@@ -68,28 +63,6 @@ class Marker:
         self.times = [0.0]
         self.curr_map = None
 
-
-    def get_gt_map(self):
-        rospy.wait_for_service('/static_map')
-        gt_map_srv = rospy.ServiceProxy('/static_map', GetMap)
-
-        while True:
-            try:
-                map_resp = gt_map_srv()
-                self.gt_map = get_map_image(map_resp)
-                assert isinstance(map_resp, GetMapResponse)
-
-                if map_resp.map.info.width <= 64:  # Default size of map before any input (64x64)
-                    continue
-
-                map_msg = map_resp.map
-                map = np.array(map_msg.data)
-                return self.get_explored_cells(map_msg.info.height, map, map_msg.info.width)
-
-
-            except rospy.ServiceException, e:
-                rospy.logwarn("Service call failed to get map: %s" % e)
-                exit(0)
 
     def process_map(self, map_msg):
         rospy.loginfo("Processing Map...")
@@ -104,7 +77,7 @@ class Marker:
         self.explored_cells = self.get_explored_cells(height, map, width)
         rospy.loginfo("Explored Cells %i", self.explored_cells)
 
-        score = float(self.explored_cells) / float(self.total_cells)
+        score = float(self.explored_cells)
         print(score)
 
         return score
@@ -158,9 +131,7 @@ class Marker:
         rospy.logwarn("Terminating after %f seconds with a score of: %0.2f%%", time_elapsed.to_sec(), self.score[-1])
 
         #scipy.misc.imsave(self.save_map, self.curr_map)
-        #scipy.misc.imsave(self.save_map_gt, self.gt_map)
         Image.fromarray(np.uint8(self.curr_map*255)).save(self.save_map)
-        Image.fromarray(np.uint8(self.gt_map*255)).save(self.save_map_gt)
 
         f = open(self.save_file, "w")
         f.write("{:0.3f}".format(self.score[-1]))

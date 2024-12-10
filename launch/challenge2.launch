@@ -5,17 +5,11 @@
 	<arg name="group"/>
 	<arg name="world"/>
 
-	<!-- Map server -->
-	<arg name="map_file" default="$(find turtlebot_explorer_marker)/maps/$(arg world).yaml"/>
-	<node pkg="map_server" name="map_server" type="map_server" args="$(arg map_file)">
-		<remap from="map" to="gt_map"/>
-	</node>
-
 	<!-- AutoMarker -->
 	<node pkg="turtlebot_explorer_marker" name="marker" type="marking_script.py" output="screen" required="True">
 		<param name="group" value="$(arg group)"/>
 		<param name="world" value="$(arg world)"/>
-		<param name="duration" value="60"/>
+		<param name="duration" value="180"/>
 	</node>
 
 	<!-- Explorer -->
