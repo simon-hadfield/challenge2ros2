@@ -104,7 +104,7 @@ class Marker:
 
             self.curr_map = get_map_image(map_resp)
 
-        except rospy.ServiceException, e:
+        except rospy.ServiceException as e:
             rospy.logwarn("Service call failed to get map: %s" % e)
             return False
 
