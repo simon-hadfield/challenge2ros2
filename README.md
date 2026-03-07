@@ -1,8 +1,46 @@
-# TO RUN, USE the following Syntax
+# challenge2ros2
+
+TurtleBot SLAM exploration marking & evaluation — **ROS 2** edition.
+
+## Build
 
 ```bash
-roslaunch turtlebot_explorer_marker marking_sim.launch --pid=/tmp/roslaunch.pid group:=<group_name> start:=<loc> rep:=<rep_num>
+cd ~/ros2_ws
+colcon build --packages-select challenge2ros2
+source install/setup.bash
 ```
 
-NOTE:
-You MUST use the `--pid=/tmp/roslaunch.pid` flag, as this is what is used to kill the launch file.
+## Run
+
+### Real robot
+
+```bash
+ros2 launch challenge2ros2 challenge2.launch.py group:=<group> world:=<world>
+```
+
+### Simulation
+
+```bash
+ros2 launch challenge2ros2 challenge2_sim.launch.py group:=<group> world:=<world>
+```
+
+### Marking (instructor)
+
+```bash
+ros2 launch challenge2ros2 marking.launch.py group:=<group>
+```
+
+## Test
+
+```bash
+colcon test --packages-select challenge2ros2 --event-handlers console_direct+
+colcon test-result --verbose
+```
+
+## Notes
+
+- The `turtlebot_explorer` package must be available as a ROS 2 package in the
+  same workspace.
+- The marking node calls the `/dynamic_map` service (`nav_msgs/srv/GetMap`)
+  which is typically served by SLAM Toolbox.
+- Ground-truth map serving uses `nav2_map_server` (a Nav2 lifecycle node).
