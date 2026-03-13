@@ -161,7 +161,7 @@ class Marker(Node):
 
         # --- persist results -------------------------------------------
         if self.curr_map is not None:
-            Image.fromarray(np.uint8(self.curr_map * 255)).save(self.save_map)
+            Image.fromarray(np.uint8(self.curr_map)).save(self.save_map)
 
         with open(self.save_file, 'w') as f:
             f.write('{:0.3f}'.format(self.score[-1]))
