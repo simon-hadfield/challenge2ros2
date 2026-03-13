@@ -12,22 +12,8 @@ source install/setup.bash
 
 ## Run
 
-### Real robot
-
 ```bash
 ros2 launch challenge2ros2 challenge2.launch.py group:=<group> world:=<world>
-```
-
-### Simulation
-
-```bash
-ros2 launch challenge2ros2 challenge2_sim.launch.py group:=<group> world:=<world>
-```
-
-### Marking (instructor)
-
-```bash
-ros2 launch challenge2ros2 marking.launch.py group:=<group>
 ```
 
 ## Test

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Marking node – evaluates SLAM exploration coverage over time."""
 
+import os
 import threading
 import time
 
@@ -15,7 +16,7 @@ from rclpy.node import Node
 def get_map_image(map_resp):
     """Convert a GetMap response into a grayscale numpy image."""
     grid = np.array(map_resp.map.data).reshape(
-        (map_resp.map.info.width, map_resp.map.info.height))
+        (map_resp.map.info.height, map_resp.map.info.width))
     grid = grid.copy()
     grid[grid == -1] = 128
     grid[grid == 0] = 255
@@ -45,10 +46,12 @@ class Marker(Node):
             self.get_logger().error("You haven't set the world!")
             raise SystemExit(1)
 
-        self.save_path = (
+        self.save_path = os.path.expanduser(
             self.get_parameter('savepath').get_parameter_value().string_value)
         self.duration = (
             self.get_parameter('duration').get_parameter_value().integer_value)
+
+        os.makedirs(self.save_path, exist_ok=True)
 
         self.save_file = '{}/{}_{}_log.txt'.format(
             self.save_path, self.group, self.world)
