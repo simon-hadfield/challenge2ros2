@@ -1,7 +1,7 @@
 """Launch the marking node together with the turtlebot_explorer stack."""
 
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, Shutdown
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
@@ -25,13 +25,22 @@ def generate_launch_description():
                 'world': LaunchConfiguration('world'),
                 'duration': 180,
             }],
+            on_exit=Shutdown(),
+        ),
+
+        # ---------- explorer (external package) ------------------------
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource([
+                FindPackageShare('turtlebot3_bringup'),
+                '/launch/robot.launch.py',
+            ]),
         ),
 
         # ---------- explorer (external package) ------------------------
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([
                 FindPackageShare('turtlebot_explorer'),
-                '/launch/turtlebot_explorer.launch.py',
+                '/launch/explorer.launch.py',
             ]),
         ),
     ])

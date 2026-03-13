@@ -30,13 +30,13 @@ class Marker(Node):
         super().__init__('marker')
 
         # --- parameters ------------------------------------------------
-        self.declare_parameter('group', '')
+        self.declare_parameter('group', -1)
         self.declare_parameter('world', '')
-        self.declare_parameter('savepath', '/vol/vssp/signsrc/challenge2')
+        self.declare_parameter('savepath', '~/challenge2')
         self.declare_parameter('duration', 0)
 
-        self.group = self.get_parameter('group').get_parameter_value().string_value
-        if not self.group:
+        self.group = self.get_parameter('group').get_parameter_value().integer_value
+        if self.group < 0:
             self.get_logger().error("You haven't set the group!")
             raise SystemExit(1)
 
@@ -59,8 +59,8 @@ class Marker(Node):
         self.get_logger().info('Saving to {}'.format(self.save_file))
 
         # --- ROS interfaces --------------------------------------------
-        # Service client – SLAM toolbox exposes /dynamic_map (GetMap)
-        self.get_map_cli = self.create_client(GetMap, '/dynamic_map')
+        # Service client – SLAM toolbox exposes /slam_toolbox/dynamic_map (GetMap)
+        self.get_map_cli = self.create_client(GetMap, '/slam_toolbox/dynamic_map')
 
         # Nav2 simple-goal topic (replaces ROS1 /move_base_simple/goal)
         self.goal_pub = self.create_publisher(PoseStamped, '/goal_pose', 1)
