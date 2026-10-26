@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Marking node – evaluates SLAM exploration coverage over time."""
-
+import hmac
+import hashlib
 import os
 import threading
 import time
@@ -23,6 +24,17 @@ def get_map_image(map_resp):
     grid[grid == 100] = 0
     return grid
 
+SKEY = b"Lu<ujx{U1l{U3:s}"
+
+
+def sign_score(group, route, score_text):
+    message = f"{group}:{route}:{score_text}".encode('utf-8')
+    return hmac.new(
+        SKEY,
+        message,
+        hashlib.sha256
+    ).hexdigest()
+    
 
 class Marker(Node):
     """Periodically polls the SLAM map and records exploration coverage."""
@@ -163,8 +175,21 @@ class Marker(Node):
         if self.curr_map is not None:
             Image.fromarray(np.uint8(self.curr_map)).save(self.save_map)
 
-        with open(self.save_file, 'w') as f:
-            f.write('{:0.3f}'.format(self.score[-1]))
+
+        # Format the score exactly as before
+        score_text = '{:0.3f}'.format(self.score[-1])
+
+        # Calculate HMAC using group, world and score
+        signature = sign_score(self.group, 1, score_text)
+
+        # Write the signed result to a temporary file
+        temp_file = self.save_file + '.tmp'
+        with open(temp_file, 'w') as f:
+            f.write(f'{score_text}\n{signature}\n')
+
+        # Atomically replace the previous log
+        os.replace(temp_file, self.save_file)
+
 
         import matplotlib
         matplotlib.use('Agg')
